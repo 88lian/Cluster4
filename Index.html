@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>SCOUTING ASSESSMENT | CLUSTER 4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Condensed:ital,wght@0,700;0,900;1,700;1,900&family=Inter:wght@400;700;900&display=swap');
+        :root { --nike-black: #000000; --adidas-white: #ffffff; --performance-gold: #FFD700; }
+        body { font-family: 'Inter', sans-serif; background-color: #f4f4f4; color: var(--nike-black); width: 100%; overflow-x: hidden; }
+        .performance-text { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; font-style: italic; }
+        .brand-header { background-color: var(--nike-black); clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%); }
+        .form-input { border: 2px solid var(--nike-black); padding: 1rem; background: var(--adidas-white); font-weight: 700; text-transform: uppercase; width: 100%; font-size: 16px; border-radius: 0px; }
+        .section-header { background: var(--nike-black); color: var(--adidas-white); padding: 0.5rem 2rem 0.5rem 1rem; clip-path: polygon(0 0, 92% 0, 100% 100%, 0 100%); }
+        .submit-btn { background: var(--nike-black); color: var(--adidas-white); font-family: 'Barlow Condensed', sans-serif; font-weight: 900; width: 100%; padding: 1.5rem; border: 4px solid var(--nike-black); cursor: pointer; font-size: 1.5rem; }
+        input[type="radio"] { width: 1.5rem; height: 1.5rem; cursor: pointer; accent-color: var(--nike-black); }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <header class="brand-header text-white pt-16 pb-24 px-6">
+        <div class="max-w-4xl mx-auto">
+            <p class="performance-text text-yellow-400 font-bold tracking-widest mb-2">FSUU // CLUSTER 4</p>
+            <h1 class="performance-text text-6xl md:text-8xl font-black leading-none">SCOUTING PORTAL</h1>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto -mt-12 px-4 space-y-8">
+        <form id="scoutingForm" class="space-y-6">
+            
+            <div class="bg-white p-6 border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                <div class="section-header mb-6"><h2 class="performance-text text-xl font-black">01 // BASIC INTEL</h2></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" name="fullName" placeholder="FULL NAME" required class="form-input">
+                    <select name="gender" id="genderSelect" required class="form-input">
+                        <option value="">GENDER</option>
+                        <option value="MALE">MALE</option>
+                        <option value="FEMALE">FEMALE</option>
+                    </select>
+                    <select name="organization" required class="form-input">
+                        <option value="">SELECT ORGANIZATION</option>
+                        <option>Philippine Student Nurses Association</option>
+                        <option>United Tourism and Hospitality Young Professionals</option>
+                        <option>Junior Social Entrepreneurs Society</option>
+                        <option>Psychology Society</option>
+                        <option>FSUU College Red Cross Youth</option>
+                        <option>Volunteer Youth Leaders for Health</option>
+                    </select>
+                    <div class="flex gap-2">
+                        <input type="text" name="course" placeholder="COURSE" required class="form-input">
+                        <select name="yearLevel" required class="form-input w-28">
+                            <option value="">YEAR</option>
+                            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                <div class="section-header mb-6"><h2 class="performance-text text-xl font-black">02 // COMPETITIVE SPECS</h2></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <select id="sportSelect" name="primarySport" required class="form-input">
+                        <option value="">SELECT EVENT</option>
+                        <option>BASKETBALL</option>
+                        <option>VOLLEYBALL</option>
+                        <option>BADMINTON</option>
+                        <option>PICKLEBALL</option>
+                        <option>TABLE TENNIS</option>
+                        <option>DARTS</option>
+                    </select>
+                    <select id="roleSelect" name="specificRole" required class="form-input">
+                        <option value="">SELECT ROLE/FORMAT</option>
+                    </select>
+                    <select name="experienceLevel" required class="form-input">
+                        <option value="">EXPERIENCE LEVEL</option>
+                        <option>Recreational</option>
+                        <option>Intramurals</option>
+                        <option>Varsity</option>
+                        <option>National Level</option>
+                    </select>
+                    <input type="number" name="yearsExperience" placeholder="YEARS OF EXPERIENCE" required class="form-input">
+                </div>
+            </div>
+
+            <div class="bg-white border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                <div class="p-6 pb-0">
+                    <div class="section-header mb-4"><h2 class="performance-text text-xl font-black">03 // PERFORMANCE MATRIX (1-5)</h2></div>
+                </div>
+                <div id="skillsContainer" class="divide-y divide-gray-200">
+                    <div class="p-8 text-center text-gray-400 font-bold italic uppercase">Select an event to load metrics...</div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                <div class="section-header mb-6"><h2 class="performance-text text-xl font-black">04 // VALIDATION</h2></div>
+                <label class="block text-[10px] font-black uppercase mb-1">LINK PHOTOS OR VIDEOS FROM EVENTS ATTENDED (DRIVE/SOCIAL MEDIA)</label>
+                <input type="url" name="evidenceLink" placeholder="https://..." class="form-input mb-4" required>
+                <textarea name="achievements" placeholder="TOURNAMENT HISTORY & ACHIEVEMENTS" class="form-input" rows="4"></textarea>
+            </div>
+
+            <button type="submit" id="submitBtn" class="submit-btn italic">SUBMIT SCOUTING REPORT // LCO 2026</button>
+        </form>
+    </main>
+
+    <div id="statusMessage" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-10 text-center border-8 border-yellow-400 max-w-sm w-full">
+            <h2 id="statusTitle" class="performance-text text-4xl font-black italic mb-2">TRANSMITTING</h2>
+            <p id="statusDesc" class="font-bold uppercase text-sm tracking-widest"></p>
+        </div>
+    </div>
+
+    <script>
+        const sheetAppUrl = "https://script.google.com/macros/s/AKfycbynC7q_t_GscZBEn6Hdfx8jzfj1U21mvbjbWIHZ4xyiAPMdTkUWUviJhRorjsAN197n/exec";
+
+        const sportSelect = document.getElementById('sportSelect');
+        const roleSelect = document.getElementById('roleSelect');
+        const genderSelect = document.getElementById('genderSelect');
+        const skillsContainer = document.getElementById('skillsContainer');
+
+        const sportData = {
+            'BASKETBALL': {
+                roles: ['Point Guard', 'Shooting Guard', 'Small Forward', 'Power Forward', 'Center'],
+                metrics: ['Shooting Proficiency', 'Scoring Ability', 'Defensive Impact', 'Ball Security', 'Spatial Awareness']
+            },
+            'VOLLEYBALL': {
+                roles: ['Setter', 'Outside Hitter', 'Opposite Hitter', 'Middle Blocker', 'Libero', 'Specialist'],
+                metrics: ['Attack Power', 'Reception Accuracy', 'Service Mastery', 'Net Dominance', 'Floor Agility']
+            },
+            'BADMINTON': {
+                roles: { 'MALE': ['Singles Men', 'Mixed Doubles'], 'FEMALE': ['Singles Women', 'Mixed Doubles'] },
+                metrics: ['Stroke Precision', 'Smash Velocity', 'Footwork Fluidity', 'Tactical Awareness', 'Reaction Speed']
+            },
+            'PICKLEBALL': {
+                roles: { 'MALE': ['Singles Men', 'Doubles/Mix'], 'FEMALE': ['Singles Women', 'Doubles/Mix'] },
+                metrics: ['Kitchen Control', 'Dinking Accuracy', 'Serve Depth', 'Volley Reflexes', 'Placement Precision']
+            },
+            'TABLE TENNIS': {
+                roles: { 'MALE': ['Singles Men', 'Doubles/Mix'], 'FEMALE': ['Singles Women', 'Doubles/Mix'] },
+                metrics: ['Spin Variation', 'Loop Stability', 'Flick Precision', 'Short Game Touch', 'Reaction Reflexes']
+            },
+            'DARTS': {
+                roles: ['Singles (Open)'],
+                metrics: ['Targeting Precision', 'Consistent Grouping', 'Triple Area Mastery', 'Closing Proficiency', 'Mental Composure']
+            }
+        };
+
+        function updateOptions() {
+            const sport = sportSelect.value;
+            const gender = genderSelect.value;
+            roleSelect.innerHTML = '<option value="">SELECT ROLE/FORMAT</option>';
+            skillsContainer.innerHTML = '';
+
+            if (sportData[sport]) {
+                let options = [];
+                if (sport === 'BASKETBALL' || sport === 'VOLLEYBALL' || sport === 'DARTS') {
+                    options = sportData[sport].roles;
+                } else if (gender && sportData[sport].roles[gender]) {
+                    options = sportData[sport].roles[gender];
+                } else if (!gender) {
+                    roleSelect.innerHTML = '<option value="">SELECT GENDER FIRST</option>';
+                }
+
+                options.forEach(r => roleSelect.add(new Option(r.toUpperCase(), r)));
+
+                sportData[sport].metrics.forEach(skill => {
+                    const div = document.createElement('div');
+                    div.className = 'p-6 flex flex-col md:flex-row md:items-center justify-between gap-4';
+                    div.innerHTML = `<span class="font-bold uppercase italic text-sm md:text-base">${skill}</span>
+                        <div class="flex gap-6">${[1,2,3,4,5].map(n => `<label class="flex flex-col items-center text-[10px] font-black">
+                        <input type="radio" name="skill_${skill.replace(/ /g, '_')}" value="${n}" required> ${n}</label>`).join('')}</div>`;
+                    skillsContainer.appendChild(div);
+                });
+            }
+        }
+
+        sportSelect.addEventListener('change', updateOptions);
+        genderSelect.addEventListener('change', updateOptions);
+
+        const form = document.getElementById('scoutingForm');
+        const status = document.getElementById('statusMessage');
+        const btn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            btn.disabled = true;
+            btn.innerText = 'UPLOADING...';
+            status.classList.remove('hidden');
+            document.getElementById('statusTitle').innerText = "TRANSMITTING";
+            document.getElementById('statusDesc').innerText = "FILE SENT TO CLUSTER 4";
+
+            try {
+                await fetch(sheetAppUrl, { method: 'POST', body: new FormData(form), mode: 'no-cors' });
+                document.getElementById('statusTitle').innerText = "SUCCESS";
+                document.getElementById('statusDesc').innerText = "ATHLETE RECORD SECURED";
+                form.reset();
+                skillsContainer.innerHTML = '<div class="p-8 text-center text-gray-400 font-bold italic uppercase">Select an event to load metrics...</div>';
+            } catch (err) {
+                document.getElementById('statusTitle').innerText = "ERROR";
+                document.getElementById('statusDesc').innerText = "TRANSMISSION FAILED";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'SUBMIT SCOUTING REPORT // LCO 2026';
+                setTimeout(() => status.classList.add('hidden'), 3000);
+            }
+        });
+    </script>
+</body>
+</html>
