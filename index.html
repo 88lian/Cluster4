@@ -96,7 +96,6 @@
                 <div class="section-header mb-6"><h2 class="performance-text text-xl font-black">04 // VALIDATION</h2></div>
                 <label class="block text-[10px] font-black uppercase mb-1 text-slate-500 italic">Optional: Link Photos or Videos (Drive/FB/YouTube)</label>
                 <input type="text" name="evidenceLink" placeholder="Link (Optional)" class="form-input mb-4">
-                
                 <label class="block text-[10px] font-black uppercase mb-1 text-slate-500 italic">Tournament History & Achievements (Optional)</label>
                 <textarea name="achievements" placeholder="LIST MVP AWARDS, PREVIOUS LEAGUES, KEY STATS" class="form-input" rows="4"></textarea>
             </div>
@@ -147,60 +146,63 @@
             }
         };
 
-        function updateFormFields() {
+        function refreshForm() {
             const sport = sportSelect.value;
             const gender = genderSelect.value;
             
-            // Reset Role Dropdown
-            roleSelect.innerHTML = '<option value="">SELECT ROLE/FORMAT</option>';
+            // Clear existing roles
+            roleSelect.options.length = 1; 
             skillsContainer.innerHTML = '';
 
-            if (sportData[sport]) {
-                // 1. Handle Role Selection
-                let rolesToDisplay = [];
-                if (Array.isArray(sportData[sport].roles)) {
-                    rolesToDisplay = sportData[sport].roles;
-                } else if (gender && sportData[sport].roles[gender]) {
-                    rolesToDisplay = sportData[sport].roles[gender];
-                } else if (!gender) {
-                    roleSelect.innerHTML = '<option value="">SELECT GENDER FIRST</option>';
-                }
-
-                rolesToDisplay.forEach(role => {
-                    const opt = document.createElement('option');
-                    opt.value = role;
-                    opt.textContent = role.toUpperCase();
-                    roleSelect.appendChild(opt);
-                });
-
-                // 2. Handle Skill Matrix Generation
-                sportData[sport].metrics.forEach(skill => {
-                    const skillId = `skill_${skill.replace(/\s+/g, '_')}`;
-                    const div = document.createElement('div');
-                    div.className = 'p-6 flex flex-col md:flex-row md:items-center justify-between gap-4';
-                    div.innerHTML = `
-                        <span class="font-bold uppercase italic text-sm md:text-base">${skill}</span>
-                        <div class="flex gap-4">
-                            ${[1, 2, 3, 4, 5].map(num => `
-                                <label class="flex flex-col items-center text-[10px] font-black cursor-pointer">
-                                    <input type="radio" name="${skillId}" value="${num}" required>
-                                    ${num}
-                                </label>
-                            `).join('')}
-                        </div>
-                    `;
-                    skillsContainer.appendChild(div);
-                });
-            } else {
+            if (!sport) {
                 skillsContainer.innerHTML = '<div class="p-8 text-center text-gray-400 font-bold italic uppercase">Select a category to load performance metrics...</div>';
+                return;
             }
+
+            // Logic to populate roles
+            let list = [];
+            if (['BASKETBALL', 'VOLLEYBALL', 'DARTS'].includes(sport)) {
+                list = sportData[sport].roles;
+            } else {
+                // Racket sports require gender check
+                if (gender && sportData[sport].roles[gender]) {
+                    list = sportData[sport].roles[gender];
+                } else {
+                    const opt = document.createElement('option');
+                    opt.text = "SELECT GENDER FIRST";
+                    opt.disabled = true;
+                    roleSelect.add(opt);
+                }
+            }
+
+            list.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item;
+                opt.text = item.toUpperCase();
+                roleSelect.add(opt);
+            });
+
+            // Populate Skills Matrix
+            sportData[sport].metrics.forEach(skill => {
+                const skillName = `skill_${skill.replace(/\s+/g, '_')}`;
+                const div = document.createElement('div');
+                div.className = 'p-6 flex flex-col md:flex-row md:items-center justify-between gap-4';
+                div.innerHTML = `
+                    <span class="font-bold uppercase italic text-sm md:text-base">${skill}</span>
+                    <div class="flex gap-4">
+                        ${[1, 2, 3, 4, 5].map(v => `
+                            <label class="flex flex-col items-center text-[10px] font-black cursor-pointer">
+                                <input type="radio" name="${skillName}" value="${v}" required> ${v}
+                            </label>
+                        `).join('')}
+                    </div>`;
+                skillsContainer.appendChild(div);
+            });
         }
 
-        // Event Listeners for Dynamic Updates
-        sportSelect.addEventListener('change', updateFormFields);
-        genderSelect.addEventListener('change', updateFormFields);
+        sportSelect.addEventListener('change', refreshForm);
+        genderSelect.addEventListener('change', refreshForm);
 
-        // Form Submission Logic
         const form = document.getElementById('scoutingForm');
         const status = document.getElementById('statusMessage');
         const btn = document.getElementById('submitBtn');
@@ -211,27 +213,20 @@
             btn.innerText = 'UPLOADING...';
             status.classList.remove('hidden');
             document.getElementById('statusTitle').innerText = "TRANSMITTING";
-            document.getElementById('statusDesc').innerText = "ARCHIVING ATHLETE DATA...";
-
+            
             try {
-                const formData = new FormData(form);
-                await fetch(sheetAppUrl, { 
-                    method: 'POST', 
-                    body: formData, 
-                    mode: 'no-cors' 
-                });
-                
+                await fetch(sheetAppUrl, { method: 'POST', body: new FormData(form), mode: 'no-cors' });
                 document.getElementById('statusTitle').innerText = "SUCCESS";
-                document.getElementById('statusDesc').innerText = "SCOUTING REPORT SECURED";
+                document.getElementById('statusDesc').innerText = "ATHLETE RECORD SECURED";
                 form.reset();
-                updateFormFields(); // Reset matrix to default text
+                refreshForm();
             } catch (err) {
                 document.getElementById('statusTitle').innerText = "ERROR";
-                document.getElementById('statusDesc').innerText = "CONNECTION INTERRUPTED";
+                document.getElementById('statusDesc').innerText = "CONNECTION FAILED";
             } finally {
                 btn.disabled = false;
                 btn.innerText = 'SUBMIT SCOUTING REPORT // LCO 2026';
-                setTimeout(() => { status.classList.add('hidden'); }, 3000);
+                setTimeout(() => status.classList.add('hidden'), 3000);
             }
         });
     </script>
