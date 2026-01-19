@@ -85,7 +85,7 @@
 
             <div class="bg-white border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
                 <div class="p-6 pb-0">
-                    <div class="section-header mb-4"><h2 class="performance-text text-xl font-black">03 // PERFORMANCE MATRIX</h2></div>
+                    <div class="section-header mb-4"><h2 class="performance-text text-xl font-black">03 // PERFORMANCE MATRIX (1-5)</h2></div>
                 </div>
                 <div id="skillsContainer" class="divide-y divide-gray-200">
                     <div class="p-8 text-center text-gray-400 font-bold italic uppercase">Select an event to load metrics...</div>
@@ -94,11 +94,11 @@
 
             <div class="bg-white p-6 border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
                 <div class="section-header mb-6"><h2 class="performance-text text-xl font-black">04 // VALIDATION</h2></div>
-                <label class="block text-[10px] font-black uppercase mb-1 text-slate-500">Optional: Link Photos or Videos</label>
-                <input type="text" name="evidenceLink" placeholder="Link to Drive/Social Media" class="form-input mb-4">
+                <label class="block text-[10px] font-black uppercase mb-1 text-slate-500 italic">Optional: Link Photos or Videos (e.g. Google Drive/FB)</label>
+                <input type="text" name="evidenceLink" id="evidenceLink" placeholder="Link (Optional)" class="form-input mb-4">
                 
-                <label class="block text-[10px] font-black uppercase mb-1 text-slate-500">Tournament History & Achievements</label>
-                <textarea name="achievements" placeholder="LIST PREVIOUS LEAGUES / MVP AWARDS" class="form-input" rows="4"></textarea>
+                <label class="block text-[10px] font-black uppercase mb-1 text-slate-500 italic">Tournament History & Achievements (Optional)</label>
+                <textarea name="achievements" placeholder="LIST MVP AWARDS, LEAGUES, ETC." class="form-input" rows="4"></textarea>
             </div>
 
             <button type="submit" id="submitBtn" class="submit-btn italic">SUBMIT SCOUTING REPORT // LCO 2026</button>
@@ -113,8 +113,8 @@
     </div>
 
     <script>
-        // REPLACE WITH YOUR GOOGLE APPS SCRIPT URL
-        const sheetAppUrl = "https://script.google.com/macros/s/AKfycbxbIXO7eRBgmmhH2Zyr6oa2vpQ-wVep1g51NKxBX1TUGdee3I99UQCWRb64Ghij0lOA/exec";
+        // REPLACE WITH YOUR GOOGLE WEB APP URL
+        const sheetAppUrl = "https://script.google.com/macros/s/AKfycbytBaGYAJ6GQdxGRFQbHY8rrizG6RyYFdwCPs090VOUk2a0a4XUtklFtOcLj9aCtSVoWw/exec";
 
         const sportSelect = document.getElementById('sportSelect');
         const roleSelect = document.getElementById('roleSelect');
@@ -170,7 +170,7 @@
                     const div = document.createElement('div');
                     div.className = 'p-6 flex flex-col md:flex-row md:items-center justify-between gap-4';
                     div.innerHTML = `<span class="font-bold uppercase italic text-sm md:text-base">${skill}</span>
-                        <div class="flex gap-4">${[1,2,3,4,5].map(n => `<label class="flex flex-col items-center text-[10px] font-black">
+                        <div class="flex gap-6">${[1,2,3,4,5].map(n => `<label class="flex flex-col items-center text-[10px] font-black">
                         <input type="radio" name="skill_${skill.replace(/ /g, '_')}" value="${n}" required> ${n}</label>`).join('')}</div>`;
                     skillsContainer.appendChild(div);
                 });
@@ -184,24 +184,35 @@
         const status = document.getElementById('statusMessage');
         const btn = document.getElementById('submitBtn');
 
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
             btn.disabled = true;
             btn.innerText = 'UPLOADING...';
             status.classList.remove('hidden');
             document.getElementById('statusTitle').innerText = "TRANSMITTING";
-            document.getElementById('statusDesc').innerText = "DO NOT CLOSE THIS WINDOW";
+            document.getElementById('statusDesc').innerText = "DO NOT CLOSE WINDOW";
 
-            const formData = new FormData(form);
-            
-            fetch(sheetAppUrl, {
-                method: 'POST',
-                body: formData,
-                mode: 'no-cors'
-            })
-            .then(() => {
+            try {
+                // We send the form data even if fields are empty
+                await fetch(sheetAppUrl, { 
+                    method: 'POST', 
+                    body: new FormData(form), 
+                    mode: 'no-cors' 
+                });
+                
                 document.getElementById('statusTitle').innerText = "SUCCESS";
-                document.getElementById('statusDesc').innerText = "SCOUTING REPORT SECURED";
+                document.getElementById('statusDesc').innerText = "ATHLETE RECORD SECURED";
                 form.reset();
                 skillsContainer.innerHTML = '<div class="p-8 text-center text-gray-400 font-bold italic uppercase">Select an event to load metrics...</div>';
-                setTimeout(() =>
+                setTimeout(() => status.classList.add('hidden'), 3000);
+            } catch (err) {
+                document.getElementById('statusTitle').innerText = "ERROR";
+                document.getElementById('statusDesc').innerText = "CONNECTION FAILED";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'SUBMIT SCOUTING REPORT // LCO 2026';
+            }
+        });
+    </script>
+</body>
+</html>
