@@ -33,7 +33,6 @@
             clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%);
         }
 
-        /* Removed text-transform: uppercase to allow mixed casing */
         .form-input {
             border: 2px solid var(--nike-black);
             padding: 1rem;
@@ -119,6 +118,7 @@
                         <option>Psychology Society</option>
                         <option>FSUU College Red Cross Youth</option>
                         <option>Volunteer Youth Leaders for Health</option>
+                        <option>Others</option>
                     </select>
                     <input type="text" name="course" placeholder="Course" required class="form-input">
                     <select name="yearLevel" required class="form-input">
@@ -184,7 +184,7 @@
 
     <script>
         // Update this with your deployed Apps Script Web App URL
-        const sheetAppUrl = "https://script.google.com/macros/s/AKfycbyycequGFduHQ1fMThuZlgsLUmYSohQFNGqOWuThY5XZUsHgg75qeKokZDYMNNta-Nk/exec";
+        const sheetAppUrl = "https://script.google.com/macros/s/AKfycbxZ2m19lbNPsrdDNj-l8ailIdXHMukBmS6Uxl3M4m4IvJVpxbvEMz9Q7poqjoKPakDvUQ/exec";
 
         const sportData = {
             'BASKETBALL': {
@@ -237,7 +237,8 @@
                 });
 
                 data.metrics.forEach(skill => {
-                    const skillId = skill.replace(/\s+/g, '_');
+                    // This ensures the key sent is "BASKETBALL_Shooting_Accuracy" 
+                    const skillId = `${sport}_${skill.replace(/\s+/g, '_')}`;
                     const row = document.createElement('div');
                     row.className = 'p-6 flex flex-col md:flex-row md:items-center justify-between gap-4';
                     row.innerHTML = `
@@ -245,7 +246,7 @@
                         <div class="flex gap-4">
                             ${[1, 2, 3, 4, 5].map(v => `
                                 <label class="flex flex-col items-center text-[10px] font-black cursor-pointer">
-                                    <input type="radio" name="skill_${skillId}" value="${v}" required> 
+                                    <input type="radio" name="${skillId}" value="${v}" required> 
                                     <span class="mt-1">${v}</span>
                                 </label>`).join('')}
                         </div>`;
@@ -297,4 +298,3 @@
     </script>
 </body>
 </html>
-
