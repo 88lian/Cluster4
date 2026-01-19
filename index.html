@@ -11,9 +11,12 @@
         body { font-family: 'Inter', sans-serif; background-color: #f4f4f4; color: var(--nike-black); width: 100%; overflow-x: hidden; }
         .performance-text { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; font-style: italic; }
         .brand-header { background-color: var(--nike-black); clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%); }
-        .form-input { border: 2px solid var(--nike-black); padding: 1rem; background: var(--adidas-white); font-weight: 700; text-transform: uppercase; width: 100%; font-size: 16px; border-radius: 0px; }
+        .form-input { border: 2px solid var(--nike-black); padding: 1rem; background: var(--adidas-white); font-weight: 700; text-transform: uppercase; width: 100%; font-size: 16px; border-radius: 0px; outline: none; }
+        .form-input:focus { border-color: #fbbf24; }
         .section-header { background: var(--nike-black); color: var(--adidas-white); padding: 0.5rem 2rem 0.5rem 1rem; clip-path: polygon(0 0, 92% 0, 100% 100%, 0 100%); }
-        .submit-btn { background: var(--nike-black); color: var(--adidas-white); font-family: 'Barlow Condensed', sans-serif; font-weight: 900; width: 100%; padding: 1.5rem; border: 4px solid var(--nike-black); cursor: pointer; font-size: 1.5rem; }
+        .submit-btn { background: var(--nike-black); color: var(--adidas-white); font-family: 'Barlow Condensed', sans-serif; font-weight: 900; width: 100%; padding: 1.5rem; border: 4px solid var(--nike-black); cursor: pointer; font-size: 1.5rem; transition: all 0.2s ease; }
+        .submit-btn:hover { background: #fbbf24; color: black; }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         input[type="radio"] { width: 1.8rem; height: 1.8rem; cursor: pointer; accent-color: var(--nike-black); }
     </style>
 </head>
@@ -112,7 +115,6 @@
     </div>
 
     <script>
-        // REPLACE WITH YOUR GOOGLE WEB APP URL
         const sheetAppUrl = "https://script.google.com/macros/s/AKfycbytBaGYAJ6GQdxGRFQbHY8rrizG6RyYFdwCPs090VOUk2a0a4XUtklFtOcLj9aCtSVoWw/exec";
 
         const sportData = {
@@ -151,55 +153,62 @@
             const selectedSport = sportSelect.value;
             const selectedGender = genderSelect.value;
             
-            // Clear dropdown and matrix
+            // 1. Reset the dropdown and matrix container
             roleSelect.innerHTML = '<option value="">SELECT ROLE/FORMAT</option>';
             skillsContainer.innerHTML = '';
 
-            if (selectedSport && sportData[selectedSport]) {
-                const data = sportData[selectedSport];
-                
-                // POPULATE ROLES
-                let rolesList = [];
-                if (Array.isArray(data.roles)) {
-                    rolesList = data.roles;
-                } else if (selectedGender && data.roles[selectedGender]) {
-                    rolesList = data.roles[selectedGender];
-                }
+            // 2. If no sport is selected, stop here
+            if (!selectedSport || !sportData[selectedSport]) {
+                skillsContainer.innerHTML = '<div class="p-8 text-center text-gray-400 font-bold italic uppercase">Select a category to load performance metrics...</div>';
+                return;
+            }
 
-                if (rolesList.length > 0) {
-                    rolesList.forEach(role => {
-                        const opt = document.createElement('option');
-                        opt.value = role;
-                        opt.textContent = role.toUpperCase();
-                        roleSelect.appendChild(opt);
-                    });
-                } else {
+            const data = sportData[selectedSport];
+            
+            // 3. Determine and Populate Roles
+            let rolesList = [];
+            
+            // Check if roles are gender-specific or general
+            if (Array.isArray(data.roles)) {
+                rolesList = data.roles;
+            } else if (selectedGender && data.roles[selectedGender]) {
+                rolesList = data.roles[selectedGender];
+            }
+
+            if (rolesList.length > 0) {
+                rolesList.forEach(role => {
                     const opt = document.createElement('option');
-                    opt.textContent = "SELECT GENDER TO SEE ROLES";
-                    opt.disabled = true;
+                    opt.value = role;
+                    opt.textContent = role.toUpperCase();
                     roleSelect.appendChild(opt);
-                }
-
-                // POPULATE SKILLS
-                data.metrics.forEach(skill => {
-                    const row = document.createElement('div');
-                    row.className = 'p-6 flex flex-col md:flex-row md:items-center justify-between gap-4';
-                    row.innerHTML = `
-                        <span class="font-bold uppercase italic text-sm md:text-base">${skill}</span>
-                        <div class="flex gap-4">
-                            ${[1, 2, 3, 4, 5].map(v => `
-                                <label class="flex flex-col items-center text-[10px] font-black cursor-pointer">
-                                    <input type="radio" name="skill_${skill.replace(/\s+/g, '_')}" value="${v}" required> ${v}
-                                </label>`).join('')}
-                        </div>`;
-                    skillsContainer.appendChild(row);
                 });
             } else {
-                skillsContainer.innerHTML = '<div class="p-8 text-center text-gray-400 font-bold italic uppercase">Select a category to load performance metrics...</div>';
+                // If the sport requires gender-specific roles but gender isn't picked yet
+                const opt = document.createElement('option');
+                opt.textContent = "SELECT GENDER FIRST";
+                opt.disabled = true;
+                opt.selected = true;
+                roleSelect.appendChild(opt);
             }
+
+            // 4. Populate Skill Metrics Matrix
+            data.metrics.forEach(skill => {
+                const row = document.createElement('div');
+                row.className = 'p-6 flex flex-col md:flex-row md:items-center justify-between gap-4';
+                row.innerHTML = `
+                    <span class="font-bold uppercase italic text-sm md:text-base">${skill}</span>
+                    <div class="flex gap-4">
+                        ${[1, 2, 3, 4, 5].map(v => `
+                            <label class="flex flex-col items-center text-[10px] font-black cursor-pointer">
+                                <input type="radio" name="skill_${skill.replace(/\s+/g, '_')}" value="${v}" required> 
+                                <span class="mt-1">${v}</span>
+                            </label>`).join('')}
+                    </div>`;
+                skillsContainer.appendChild(row);
+            });
         }
 
-        // Trigger update on ANY change
+        // Event Listeners
         sportSelect.addEventListener('change', forceUpdate);
         genderSelect.addEventListener('change', forceUpdate);
 
@@ -211,18 +220,29 @@
             e.preventDefault();
             btn.disabled = true;
             btn.innerText = 'UPLOADING...';
+            
+            const statusTitle = document.getElementById('statusTitle');
+            const statusDesc = document.getElementById('statusDesc');
+            
             status.classList.remove('hidden');
-            document.getElementById('statusTitle').innerText = "TRANSMITTING";
+            statusTitle.innerText = "TRANSMITTING";
+            statusDesc.innerText = "SENDING TO SERVERS...";
             
             try {
-                await fetch(sheetAppUrl, { method: 'POST', body: new FormData(form), mode: 'no-cors' });
-                document.getElementById('statusTitle').innerText = "SUCCESS";
-                document.getElementById('statusDesc').innerText = "RECORD SECURED";
+                const formData = new FormData(form);
+                await fetch(sheetAppUrl, { 
+                    method: 'POST', 
+                    body: formData, 
+                    mode: 'no-cors' 
+                });
+                
+                statusTitle.innerText = "SUCCESS";
+                statusDesc.innerText = "RECORD SECURED";
                 form.reset();
                 forceUpdate();
             } catch (err) {
-                document.getElementById('statusTitle').innerText = "ERROR";
-                document.getElementById('statusDesc').innerText = "CHECK CONNECTION";
+                statusTitle.innerText = "ERROR";
+                statusDesc.innerText = "CHECK CONNECTION";
             } finally {
                 btn.disabled = false;
                 btn.innerText = 'SUBMIT SCOUTING REPORT // LCO 2026';
