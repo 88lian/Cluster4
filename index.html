@@ -61,13 +61,13 @@
                 <div class="section-header mb-6"><h2 class="performance-text text-xl font-black">02 // COMPETITIVE SPECS</h2></div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <select id="sportSelect" name="primarySport" required class="form-input">
-                        <option value="">SELECT EVENT</option>
-                        <option>BASKETBALL</option>
-                        <option>VOLLEYBALL</option>
-                        <option>BADMINTON</option>
-                        <option>PICKLEBALL</option>
-                        <option>TABLE TENNIS</option>
-                        <option>DARTS</option>
+                        <option value="">SELECT CATEGORY</option>
+                        <option value="BASKETBALL">BASKETBALL</option>
+                        <option value="VOLLEYBALL">VOLLEYBALL</option>
+                        <option value="BADMINTON">BADMINTON</option>
+                        <option value="PICKLEBALL">PICKLEBALL</option>
+                        <option value="TABLE TENNIS">TABLE TENNIS</option>
+                        <option value="DARTS">DARTS</option>
                     </select>
                     <select id="roleSelect" name="specificRole" required class="form-input">
                         <option value="">SELECT ROLE/FORMAT</option>
@@ -88,17 +88,17 @@
                     <div class="section-header mb-4"><h2 class="performance-text text-xl font-black">03 // PERFORMANCE MATRIX (1-5)</h2></div>
                 </div>
                 <div id="skillsContainer" class="divide-y divide-gray-200">
-                    <div class="p-8 text-center text-gray-400 font-bold italic uppercase">Select an event to load metrics...</div>
+                    <div class="p-8 text-center text-gray-400 font-bold italic uppercase">Select a category to load performance metrics...</div>
                 </div>
             </div>
 
             <div class="bg-white p-6 border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
                 <div class="section-header mb-6"><h2 class="performance-text text-xl font-black">04 // VALIDATION</h2></div>
-                <label class="block text-[10px] font-black uppercase mb-1 text-slate-500 italic">Optional: Link Photos or Videos (e.g. Google Drive/FB)</label>
-                <input type="text" name="evidenceLink" id="evidenceLink" placeholder="Link (Optional)" class="form-input mb-4">
+                <label class="block text-[10px] font-black uppercase mb-1 text-slate-500 italic">Optional: Link Photos or Videos (Drive/FB/YouTube)</label>
+                <input type="text" name="evidenceLink" placeholder="Link (Optional)" class="form-input mb-4">
                 
                 <label class="block text-[10px] font-black uppercase mb-1 text-slate-500 italic">Tournament History & Achievements (Optional)</label>
-                <textarea name="achievements" placeholder="LIST MVP AWARDS, LEAGUES, ETC." class="form-input" rows="4"></textarea>
+                <textarea name="achievements" placeholder="LIST MVP AWARDS, PREVIOUS LEAGUES, KEY STATS" class="form-input" rows="4"></textarea>
             </div>
 
             <button type="submit" id="submitBtn" class="submit-btn italic">SUBMIT SCOUTING REPORT // LCO 2026</button>
@@ -113,7 +113,6 @@
     </div>
 
     <script>
-        // REPLACE WITH YOUR GOOGLE WEB APP URL
         const sheetAppUrl = "https://script.google.com/macros/s/AKfycbytBaGYAJ6GQdxGRFQbHY8rrizG6RyYFdwCPs090VOUk2a0a4XUtklFtOcLj9aCtSVoWw/exec";
 
         const sportSelect = document.getElementById('sportSelect');
@@ -148,38 +147,60 @@
             }
         };
 
-        function updateOptions() {
+        function updateFormFields() {
             const sport = sportSelect.value;
             const gender = genderSelect.value;
+            
+            // Reset Role Dropdown
             roleSelect.innerHTML = '<option value="">SELECT ROLE/FORMAT</option>';
             skillsContainer.innerHTML = '';
 
             if (sportData[sport]) {
-                let options = [];
-                if (sport === 'BASKETBALL' || sport === 'VOLLEYBALL' || sport === 'DARTS') {
-                    options = sportData[sport].roles;
+                // 1. Handle Role Selection
+                let rolesToDisplay = [];
+                if (Array.isArray(sportData[sport].roles)) {
+                    rolesToDisplay = sportData[sport].roles;
                 } else if (gender && sportData[sport].roles[gender]) {
-                    options = sportData[sport].roles[gender];
+                    rolesToDisplay = sportData[sport].roles[gender];
                 } else if (!gender) {
                     roleSelect.innerHTML = '<option value="">SELECT GENDER FIRST</option>';
                 }
 
-                options.forEach(r => roleSelect.add(new Option(r.toUpperCase(), r)));
+                rolesToDisplay.forEach(role => {
+                    const opt = document.createElement('option');
+                    opt.value = role;
+                    opt.textContent = role.toUpperCase();
+                    roleSelect.appendChild(opt);
+                });
 
+                // 2. Handle Skill Matrix Generation
                 sportData[sport].metrics.forEach(skill => {
+                    const skillId = `skill_${skill.replace(/\s+/g, '_')}`;
                     const div = document.createElement('div');
                     div.className = 'p-6 flex flex-col md:flex-row md:items-center justify-between gap-4';
-                    div.innerHTML = `<span class="font-bold uppercase italic text-sm md:text-base">${skill}</span>
-                        <div class="flex gap-6">${[1,2,3,4,5].map(n => `<label class="flex flex-col items-center text-[10px] font-black">
-                        <input type="radio" name="skill_${skill.replace(/ /g, '_')}" value="${n}" required> ${n}</label>`).join('')}</div>`;
+                    div.innerHTML = `
+                        <span class="font-bold uppercase italic text-sm md:text-base">${skill}</span>
+                        <div class="flex gap-4">
+                            ${[1, 2, 3, 4, 5].map(num => `
+                                <label class="flex flex-col items-center text-[10px] font-black cursor-pointer">
+                                    <input type="radio" name="${skillId}" value="${num}" required>
+                                    ${num}
+                                </label>
+                            `).join('')}
+                        </div>
+                    `;
                     skillsContainer.appendChild(div);
                 });
+            } else {
+                skillsContainer.innerHTML = '<div class="p-8 text-center text-gray-400 font-bold italic uppercase">Select a category to load performance metrics...</div>';
             }
         }
 
-        sportSelect.addEventListener('change', updateOptions);
-        genderSelect.addEventListener('change', updateOptions);
+        // Event Listeners for Dynamic Updates
+        sportSelect.addEventListener('change', updateFormFields);
+        genderSelect.addEventListener('change', updateFormFields);
 
+        // Form Submission Logic
         const form = document.getElementById('scoutingForm');
         const status = document.getElementById('statusMessage');
         const btn = document.getElementById('submitBtn');
@@ -190,27 +211,27 @@
             btn.innerText = 'UPLOADING...';
             status.classList.remove('hidden');
             document.getElementById('statusTitle').innerText = "TRANSMITTING";
-            document.getElementById('statusDesc').innerText = "DO NOT CLOSE WINDOW";
+            document.getElementById('statusDesc').innerText = "ARCHIVING ATHLETE DATA...";
 
             try {
-                // We send the form data even if fields are empty
+                const formData = new FormData(form);
                 await fetch(sheetAppUrl, { 
                     method: 'POST', 
-                    body: new FormData(form), 
+                    body: formData, 
                     mode: 'no-cors' 
                 });
                 
                 document.getElementById('statusTitle').innerText = "SUCCESS";
-                document.getElementById('statusDesc').innerText = "ATHLETE RECORD SECURED";
+                document.getElementById('statusDesc').innerText = "SCOUTING REPORT SECURED";
                 form.reset();
-                skillsContainer.innerHTML = '<div class="p-8 text-center text-gray-400 font-bold italic uppercase">Select an event to load metrics...</div>';
-                setTimeout(() => status.classList.add('hidden'), 3000);
+                updateFormFields(); // Reset matrix to default text
             } catch (err) {
                 document.getElementById('statusTitle').innerText = "ERROR";
-                document.getElementById('statusDesc').innerText = "CONNECTION FAILED";
+                document.getElementById('statusDesc').innerText = "CONNECTION INTERRUPTED";
             } finally {
                 btn.disabled = false;
                 btn.innerText = 'SUBMIT SCOUTING REPORT // LCO 2026';
+                setTimeout(() => { status.classList.add('hidden'); }, 3000);
             }
         });
     </script>
